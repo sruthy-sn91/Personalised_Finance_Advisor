@@ -5,24 +5,40 @@ Personal Finance Advisor is a comprehensive, AI-powered tool designed to help us
 This project demonstrates the integration of modern AI techniques and financial data analysis to create an end-to-end financial advisory system. Key functionalities include:
 
 ** LLM Inference: Use a state-of-the-art language model (via the Groq API) to answer finance-related questions.
+
 ** PEFT (LoRA Fine-Tuning): Fine-tune the language model in a parameter-efficient manner to adapt to the financial domain.
+
 ** RLHF: Record and use user feedback to iteratively improve the model.
-PDF Ingestion and RAG: Extract text from financial PDFs and create a searchable document repository using FAISS.
+
+** PDF Ingestion and RAG: Extract text from financial PDFs and create a searchable document repository using FAISS.
+
 ** Market Data & Sentiment Analysis: Retrieve real-time market data and perform sentiment analysis to support investment recommendations.
+
 ** Recommendation Engine: Provide actionable buy/sell/hold advice based on market data and sentiment.
+
 **  Assessment & Scenario Analysis: Evaluate user risk profiles and simulate various market scenarios.
+
 ** Voice Assistant: Enable hands-free interaction with speech recognition and text-to-speech.
 
 ## Features
 
 ** Ask a Finance Question: Submit natural language questions and get answers powered by a fine-tuned language model.
+
 ** Upload Financial Statements: Ingest PDFs containing company financial statements and index their content for retrieval.
+
 ** Compare Company Statements: Compare data across multiple financial reports.
+
 ** Buy/Sell Recommendations: Receive tailored investment recommendations based on market data and sentiment.
+
+
 ** Scenario Analysis: Simulate market conditions (like a recession or tech downturn) to forecast portfolio impacts.
+
 ** Risk Assessment: Get personalized portfolio recommendations based on your risk tolerance.
+
 ** Voice Assistant: Interact using voice commands.
-Feedback Loop: Provide feedback to help refine and improve the model.
+
+** Feedback Loop: Provide feedback to help refine and improve the model.
+
 ** Set Alerts & Preferences: Configure price alerts, financial goals, and user preferences.
 
 ## Technologies Used
@@ -54,43 +70,81 @@ Jinja2, HTML, CSS, JavaScript – For front-end interface and styling.
 ## Project Structure
 
 PersonalFinanceAdvisor/
+
 ├── README.md
+
 ├── requirements.txt
+
 ├── .env
+
 ├── run.py
+
 ├── config/
+
 │   └── config.py
+
 ├── data/
+
 │   └── (Place your PDF statements here)
+
 ├── logs/
+
 │   └── rlhf_feedback_logs.json
+
 ├── src/
+
 │   ├── __init__.py
+
 │   ├── main.py                   # Central orchestration of all functionalities
+
 │   ├── ingestion/
+
 │   │   └── pdf_ingestion.py        # PDF ingestion and text extraction
+
 │   ├── rag/
+
 │   │   ├── vector_store.py         # Creating and managing the FAISS vector store
+
 │   │   └── retriever.py            # Document retrieval from the vector store
+
 │   ├── llm/
+
 │   │   ├── inference.py            # Language model inference (LLM responses)
+
 │   │   ├── finetune_lora.py        # PEFT (LoRA) fine-tuning of the LLM
+
 │   │   └── rlhf_trainer.py         # Recording user feedback for RLHF
+
 │   ├── services/
+
 │   │   ├── market_data.py          # Fetching market data using yfinance
+
 │   │   ├── sentiment_analysis.py   # Dummy sentiment analysis from news
+
 │   │   ├── recommendation_engine.py# Generating buy/sell/hold recommendations
+
 │   │   ├── risk_assessment.py      # Assessing user risk profiles
+
 │   │   ├── scenario_analysis.py    # Simulating market scenarios on portfolios
+
 │   │   └── compliance.py           # Appending legal disclaimers to responses
+
 │   └── voice/
+
 │       └── voice_assistant.py      # Voice recognition and text-to-speech interaction
+
 └── web_app/
+
     ├── __init__.py
+    
     ├── app.py                    # FastAPI web application with defined endpoints
+    
     ├── templates/
+    
     │   └── index.html            # Web interface layout and forms
+    
     └── static/
+    
         └── style.css             # CSS for styling the web interface
 
 
@@ -99,22 +153,24 @@ PersonalFinanceAdvisor/
 1. Clone the repository
 
    git clone https://github.com/yourusername/PersonalFinanceAdvisor.git
+   
    cd PersonalFinanceAdvisor
 
 3.  Create a virtual environment and activate it:
 
     python -m venv venv
+
     source venv/bin/activate   # Windows: venv\Scripts\activate
 
     conda create -n virtenv -y
       
-4. Install the dependencies
+5. Install the dependencies
 
    pip install -r requirements.txt
 
-5.  Configure environment variables
+6.  Configure environment variables
 
-    Create a .env file in the root directory and add your API keys and      configuration settings (e.g., GROQ_API_KEY, NEWS_API_KEY, etc.).
+    Create a .env file in the root directory and add your API keys and configuration settings (e.g., GROQ_API_KEY, NEWS_API_KEY, etc.).
    
 7.  Start the FastAPI server by running:
 
@@ -127,33 +183,43 @@ PersonalFinanceAdvisor/
 ## Functionalities
 
 ** Ask a Finance Question:
+
 Submit your financial or investment queries via the form and receive AI-generated responses with compliance disclaimers.
 
 ** Upload PDFs:
+
 Upload financial statements (PDFs) to ingest and index the data for analysis.
 
 ** Compare Company Statements:
+
 Compare data across multiple financial documents by entering a comparison query.
 
 ** Buy/Sell Recommendations:
+
 Enter a stock symbol (and optionally, your risk tolerance) to get personalized investment recommendations.
 
 ** Scenario Analysis:
+
 Simulate various market conditions (e.g., recession, tech downturn) on your portfolio and see the projected impact.
 
 ** Risk Assessment:
+
 Get an evaluation of your risk tolerance and receive a recommended portfolio strategy.
 
 ** Voice Assistant:
+
 Use the voice assistant to ask questions and get audible responses.
 
 ** Feedback & Model Improvement:
+
 Provide feedback on the AI responses to help improve the model through RLHF.
 
 ** Set Alerts & Preferences:
+
 Configure price alerts and update your personal financial goals and preferences.
 
 ** Macro Brief:
+
 Access a quick summary of macroeconomic conditions.
 
 ## Contributing
