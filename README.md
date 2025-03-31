@@ -30,7 +30,6 @@ This project demonstrates the integration of modern AI techniques and financial 
 
 ** Buy/Sell Recommendations: Receive tailored investment recommendations based on market data and sentiment.
 
-
 ** Scenario Analysis: Simulate market conditions (like a recession or tech downturn) to forecast portfolio impacts.
 
 ** Risk Assessment: Get personalized portfolio recommendations based on your risk tolerance.
@@ -57,6 +56,7 @@ This project demonstrates the integration of modern AI techniques and financial 
 [![CSS3](https://img.shields.io/badge/CSS3-1572B6.svg?logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)
 [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E.svg?logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 
+
 Python
 FastAPI – Web framework for building API endpoints.
 Uvicorn – ASGI server for running FastAPI applications.
@@ -69,83 +69,7 @@ Jinja2, HTML, CSS, JavaScript – For front-end interface and styling.
 
 ## Project Structure
 
-PersonalFinanceAdvisor/
-
-├── README.md
-
-├── requirements.txt
-
-├── .env
-
-├── run.py
-
-├── config/
-
-│   └── config.py
-
-├── data/
-
-│   └── (Place your PDF statements here)
-
-├── logs/
-
-│   └── rlhf_feedback_logs.json
-
-├── src/
-
-│   ├── __init__.py
-
-│   ├── main.py                   # Central orchestration of all functionalities
-
-│   ├── ingestion/
-
-│   │   └── pdf_ingestion.py        # PDF ingestion and text extraction
-
-│   ├── rag/
-
-│   │   ├── vector_store.py         # Creating and managing the FAISS vector store
-
-│   │   └── retriever.py            # Document retrieval from the vector store
-
-│   ├── llm/
-
-│   │   ├── inference.py            # Language model inference (LLM responses)
-
-│   │   ├── finetune_lora.py        # PEFT (LoRA) fine-tuning of the LLM
-
-│   │   └── rlhf_trainer.py         # Recording user feedback for RLHF
-
-│   ├── services/
-
-│   │   ├── market_data.py          # Fetching market data using yfinance
-
-│   │   ├── sentiment_analysis.py   # Dummy sentiment analysis from news
-
-│   │   ├── recommendation_engine.py# Generating buy/sell/hold recommendations
-
-│   │   ├── risk_assessment.py      # Assessing user risk profiles
-
-│   │   ├── scenario_analysis.py    # Simulating market scenarios on portfolios
-
-│   │   └── compliance.py           # Appending legal disclaimers to responses
-
-│   └── voice/
-
-│       └── voice_assistant.py      # Voice recognition and text-to-speech interaction
-
-└── web_app/
-
-    ├── __init__.py
-    
-    ├── app.py                    # FastAPI web application with defined endpoints
-    
-    ├── templates/
-    
-    │   └── index.html            # Web interface layout and forms
-    
-    └── static/
-    
-        └── style.css             # CSS for styling the web interface
+<img width="211" alt="Screenshot 2025-03-31 at 11 58 00 PM" src="https://github.com/user-attachments/assets/27db8e3e-ea60-4b10-ac06-bcff50b22087" />
 
 
 ## How to Run
