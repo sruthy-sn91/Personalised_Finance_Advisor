@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Personal Finance Advisor</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <style>
+    /* Inline styles for demonstration; move these to your external CSS if preferred */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    section {
+      margin-bottom: 40px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    fieldset {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #aaa;
+      border-radius: 5px;
+    }
+    .portfolio-row {
+      margin-bottom: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+    th, td {
+      padding: 8px;
+      text-align: center;
+    }
+    .response-box {
+      margin-top: 10px;
+      padding: 10px;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Personal Finance Advisor</h1>
+    <p>
+      This application demonstrates LLM (Groq), RAG (PDF ingestion), PEFT (LoRA fine-tuning), and RLHF (feedback loop).
+    </p>
+
+    <!-- Section 1: Ask a Finance or Investment Question -->
+    <section id="ask-section">
+      <h2>Ask a Finance or Investment Question</h2>
+      <form id="askForm">
+        <label for="askQuery">Your Question:</label>
+        <input type="text" id="askQuery" name="user_query" placeholder="e.g., What's a good way to save for retirement?" required />
+        <br />
+        <label for="askRisk">Risk Tolerance (Optional):</label>
+        <input type="text" id="askRisk" name="risk_tolerance" placeholder="e.g., low, moderate, high" />
+        <br />
+        <button type="submit">Submit Question</button>
+      </form>
+      <div id="askAnswer" class="response-box"></div>
+    </section>
+
+    <!-- Section 2: Upload Company Financial Statements -->
+    <section id="upload-section">
+      <h2>Upload Company Financial Statements (PDF)</h2>
+      <form id="uploadForm" enctype="multipart/form-data">
+        <label for="pdfFiles">Select PDF Files:</label>
+        <input type="file" id="pdfFiles" name="files" accept="application/pdf" multiple required />
+        <br />
+        <button type="submit">Upload Files</button>
+      </form>
+      <div id="uploadStatus" class="response-box"></div>
+    </section>
+
+    <!-- Section 3: Compare Company Statements -->
+    <section id="compare-section">
+      <h2>Compare Company Statements</h2>
+      <p>
+        After uploading multiple PDFs, enter a comparison query (e.g., "Compare the revenue of the uploaded reports").
+      </p>
+      <form id="compareForm">
+        <label for="compareQuery">Comparison Query:</label>
+        <input type="text" id="compareQuery" name="compare_query" placeholder="e.g., Compare net profit trends" required />
+        <br />
+        <button type="submit">Compare</button>
+      </form>
+      <div id="compareAnswer" class="response-box"></div>
+    </section>
+
+    <!-- Section 4: Buy/Sell Recommendations -->
+    <section id="recommend-section">
+      <h2>Buy/Sell Recommendations</h2>
+      <form id="recommendForm">
+        <label for="recommendSymbol">Stock Symbol:</label>
+        <input type="text" id="recommendSymbol" name="symbol" placeholder="e.g., AAPL" required />
+        <br />
+        <label for="recommendRisk">Risk Tolerance (Optional):</label>
+        <input type="text" id="recommendRisk" name="risk_tolerance" placeholder="e.g., low, moderate, high" />
+        <br />
+        <button type="submit">Get Recommendation</button>
+      </form>
+      <div id="recommendResult" class="response-box"></div>
+    </section>
+
+    <!-- Section 5: Provide Feedback -->
+    <section id="feedback-section">
+      <h2>Provide Feedback</h2>
+      <form id="feedbackForm">
+        <label for="feedbackQuery">Your Question:</label>
+        <input type="text" id="feedbackQuery" name="user_query" required />
+        <br />
+        <label for="feedbackResponse">System Response:</label>
+        <textarea id="feedbackResponse" name="model_response" required></textarea>
+        <br />
+        <label for="feedbackText">Your Feedback:</label>
+        <textarea id="feedbackText" name="user_feedback" required placeholder="e.g., The answer was incomplete."></textarea>
+        <br />
+        <button type="submit">Submit Feedback</button>
+      </form>
+      <div id="feedbackStatus" class="response-box"></div>
+    </section>
+
+    <!-- Section 6: Set Personal Financial Goals -->
+    <section id="goals-section">
+      <h2>Set Personal Financial Goals</h2>
+      <form id="goalsForm">
+        <label for="goalsInput">Your Goals:</label>
+        <input type="text" id="goalsInput" name="goals" placeholder="e.g., Buy a house, plan for retirement" required />
+        <br />
+        <button type="submit">Save Goals</button>
+      </form>
+      <div id="goalsStatus" class="response-box"></div>
+    </section>
+
+    <!-- Section 7: Scenario Analysis (Improved) -->
+    <section id="scenario-analysis">
+      <h2>Scenario Analysis</h2>
+      <p>
+        Use this tool to predict a target end-of-month price for your stocks by applying real-time prices, market conditions, and sentiment analysis.
+      </p>
+      <!-- Wrap the scenario analysis in a form with an id -->
+      <form id="scenarioForm">
+        <fieldset>
+          <legend>Your Portfolio</legend>
+          <p>Enter each stock and the number of shares you hold. For example, if you hold 100 shares of INFY, enter "INFY" and "100".</p>
+          <div id="portfolio-inputs">
+            <div class="portfolio-row">
+              <label>Stock Symbol:
+                <input type="text" name="portfolio_symbol" placeholder="e.g., INFY" required />
+              </label>
+              <label>Number of Shares:
+                <input type="number" name="portfolio_shares" placeholder="e.g., 100" min="1" required />
+              </label>
+            </div>
+          </div>
+          <button type="button" id="add-stock-btn">+ Add Another Stock</button>
+        </fieldset>
+        
+        <fieldset>
+          <legend>Market Conditions</legend>
+          <p>
+            Adjust the settings below to define the market scenario.
+          </p>
+          <label>
+            Recession:
+            <select name="recession" id="recession-select">
+              <option value="no">No</option>
+              <option value="yes">Yes</option>
+            </select>
+          </label>
+          <br /><br />
+          <label>
+            Tech Sector Downturn (%):
+            <input type="range" name="tech_down" id="tech-down-range" min="0" max="50" step="1" value="0" />
+            <span id="tech-down-value">0</span>%
+          </label>
+        </fieldset>
+        <br />
+        <button type="submit" id="run-scenario-btn">Run Scenario</button>
+      </form>
+      <div id="scenarioResult" class="response-box"></div>
+    </section>
+
+    <!-- Section 8: Risk Assessment -->
+    <section id="risk-section">
+      <h2>Risk Assessment</h2>
+      <form id="riskForm">
+        <label for="riskTolerance">Risk Tolerance:</label>
+        <select id="riskTolerance" name="risk_tolerance" required>
+          <option value="">Select</option>
+          <option value="low">Low</option>
+          <option value="moderate">Moderate</option>
+          <option value="high">High</option>
+        </select>
+        <br />
+        <button type="submit">Assess Risk</button>
+      </form>
+      <div id="riskResult" class="response-box"></div>
+    </section>
+
+    <!-- Section 9: Macroeconomic Brief -->
+    <section id="macro-section">
+      <h2>Macroeconomic Brief</h2>
+      <button id="macroBtn">Get Macro Brief</button>
+      <div id="macroResult" class="response-box"></div>
+    </section>
+
+    <!-- Section 10: Set Price Alerts -->
+    <section id="alert-section">
+      <h2>Set Price Alerts</h2>
+      <form id="alertForm">
+        <label for="alertSymbol">Stock Symbol:</label>
+        <input type="text" id="alertSymbol" name="symbol" placeholder="e.g., AAPL" required />
+        <br />
+        <label for="alertThreshold">Price Threshold:</label>
+        <input type="number" id="alertThreshold" name="threshold" step="0.01" placeholder="e.g., 150.00" required />
+        <br />
+        <button type="submit">Set Alert</button>
+      </form>
+      <div id="alertStatus" class="response-box"></div>
+    </section>
+
+    <!-- Section 11: Set Your Preferences -->
+    <section id="preferences-section">
+      <h2>Set Your Preferences</h2>
+      <form id="preferencesForm">
+        <label for="prefRisk">Risk Aversion:</label>
+        <select id="prefRisk" name="risk_aversion" required>
+          <option value="">Select</option>
+          <option value="low">Low</option>
+          <option value="moderate">Moderate</option>
+          <option value="high">High</option>
+        </select>
+        <br />
+        <label for="prefSectors">Favorite Sectors:</label>
+        <input type="text" id="prefSectors" name="favorite_sectors" placeholder="e.g., tech, energy" required />
+        <br />
+        <button type="submit">Save Preferences</button>
+      </form>
+      <div id="preferencesStatus" class="response-box"></div>
+    </section>
+
+    <!-- Section 12: Voice Assistant -->
+    <section id="voice-section">
+      <h2>Voice Assistant</h2>
+      <p>Click "Listen" to capture audio and get a response.</p>
+      <button id="voiceBtn">Listen</button>
+      <div id="voiceAnswer" class="response-box"></div>
+    </section>
+
+    <hr />
+    <div class="disclaimer">
+      <strong>Disclaimer:</strong> This information is provided for educational purposes and does not constitute financial advice. Always consult a licensed professional.
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Helper function to handle form submissions using FormData
+      async function submitForm(formElem, url) {
+        const formData = new FormData(formElem);
+        const res = await fetch(url, { method: 'POST', body: formData });
+        return res.json();
+      }
+
+      // Ask a Finance or Investment Question
+      const askForm = document.getElementById('askForm');
+      askForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = await submitForm(askForm, '/ask');
+        document.getElementById('askAnswer').innerText = data.answer || 'No response.';
+      });
+
+      // Upload Company Financial Statements (PDF)
+      const uploadForm = document.getElementById('uploadForm');
+      uploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(uploadForm);
+        const res = await fetch('/upload_pdf', { method: 'POST', body: formData });
+        const result = await res.json();
+        document.getElementById('uploadStatus').innerText = result.message || 'No response.';
+      });
+
+      // Compare Company Statements
+      const compareForm = document.getElementById('compareForm');
+      compareForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = await submitForm(compareForm, '/compare');
+        document.getElementById('compareAnswer').innerText = data.answer || 'No response.';
+      });
+
+      // Buy/Sell Recommendations
+      const recommendForm = document.getElementById('recommendForm');
+      recommendForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = await submitForm(recommendForm, '/recommend');
+        document.getElementById('recommendResult').innerText = data.recommendation || 'No recommendation.';
+      });
+
+      // RLHF Feedback
+      const feedbackForm = document.getElementById('feedbackForm');
+      feedbackForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = await submitForm(feedbackForm, '/feedback');
+        document.getElementById('feedbackStatus').innerText = data.message || 'Feedback submitted.';
+      });
+
+      // Personal Financial Goals
+      const goalsForm = document.getElementById('goalsForm');
+      goalsForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = await submitForm(goalsForm, '/goals');
+        document.getElementById('goalsStatus').innerText = data.message || 'Goals saved.';
+      });
+
+      // Scenario Analysis: update slider display and handle dynamic rows
+      const techDownRange = document.getElementById('tech-down-range');
+      const techDownValue = document.getElementById('tech-down-value');
+      techDownRange.addEventListener('input', () => {
+        techDownValue.textContent = techDownRange.value;
+      });
+
+      // Add Another Stock Button
+      const addStockBtn = document.getElementById('add-stock-btn');
+      addStockBtn.addEventListener('click', () => {
+        const container = document.getElementById('portfolio-inputs');
+        const newRow = document.createElement('div');
+        newRow.classList.add('portfolio-row');
+        newRow.innerHTML = `
+          <label>Stock Symbol:
+            <input type="text" name="portfolio_symbol" placeholder="e.g., TCS" required />
+          </label>
+          <label>Number of Shares:
+            <input type="number" name="portfolio_shares" placeholder="e.g., 50" min="1" required />
+          </label>
+        `;
+        container.appendChild(newRow);
+      });
+
+      // Scenario Analysis Form Submission
+      const scenarioForm = document.getElementById('scenarioForm');
+      scenarioForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        // Gather portfolio data from dynamic rows
+        const portfolioSymbols = document.getElementsByName('portfolio_symbol');
+        const portfolioShares = document.getElementsByName('portfolio_shares');
+        const portfolio = [];
+        for (let i = 0; i < portfolioSymbols.length; i++) {
+          const symbol = portfolioSymbols[i].value.trim();
+          const shares = Number(portfolioShares[i].value);
+          if (symbol && shares > 0) {
+            portfolio.push({ symbol, shares });
+          }
+        }
+        // Gather scenario parameters
+        const recession = document.getElementById('recession-select').value; // "yes" or "no"
+        const techDown = Number(techDownRange.value) / 100; // Convert to decimal
+
+        const payload = {
+          portfolio: portfolio,
+          scenario_params: {
+            recession: recession,
+            tech_down: techDown
+          }
+        };
+
+        try {
+          const response = await fetch('/scenario', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const result = await response.json();
+          displayScenarioResult(result);
+        } catch (err) {
+          console.error(err);
+          document.getElementById('scenarioResult').innerText = "Error running scenario.";
+        }
+      });
+
+      // Function to display scenario results as a table
+      function displayScenarioResult(result) {
+        const container = document.getElementById('scenarioResult');
+        if (!result || !result.portfolioImpact) {
+          container.innerText = "No scenario results.";
+          return;
+        }
+        let html = `<h3>Scenario Analysis Results</h3>
+                    <table>
+                      <tr>
+                        <th>Stock</th>
+                        <th>Shares</th>
+                        <th>Current Price</th>
+                        <th>Scenario-Adjusted Price</th>
+                        <th>Sentiment</th>
+                        <th>Probable End-of-Month Price</th>
+                        <th>Change (%)</th>
+                      </tr>`;
+        result.portfolioImpact.forEach(item => {
+          html += `<tr>
+                     <td>${item.symbol}</td>
+                     <td>${item.shares}</td>
+                     <td>${item.currentPrice}</td>
+                     <td>${item.scenarioAdjustedPrice}</td>
+                     <td>${item.sentiment}</td>
+                     <td>${item.probableEndOfMonthPrice}</td>
+                     <td>${item.changePercent}</td>
+                   </tr>`;
+        });
+        html += "</table>";
+        container.innerHTML = html;
+      }
+
+      // Risk Assessment
+      const riskForm = document.getElementById('riskForm');
+      riskForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = await submitForm(riskForm, '/risk_assessment');
+        document.getElementById('riskResult').innerText = data.risk_assessment || 'No assessment.';
+      });
+
+      // Macroeconomic Brief
+      const macroBtn = document.getElementById('macroBtn');
+      macroBtn.addEventListener('click', async () => {
+        try {
+          const res = await fetch('/macro');
+          if (!res.ok) throw new Error('Macro endpoint not found');
+          const data = await res.json();
+          document.getElementById('macroResult').innerText = data.brief || 'No macro data.';
+        } catch (err) {
+          document.getElementById('macroResult').innerText = 'Error fetching macro brief.';
+        }
+      });
+
+      // Set Price Alerts
+      const alertForm = document.getElementById('alertForm');
+      alertForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = await submitForm(alertForm, '/alerts');
+        document.getElementById('alertStatus').innerText = data.message || 'Alert set.';
+      });
+
+      // Set User Preferences
+      const preferencesForm = document.getElementById('preferencesForm');
+      preferencesForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = await submitForm(preferencesForm, '/preferences');
+        document.getElementById('preferencesStatus').innerText = data.message || 'Preferences saved.';
+      });
+
+      // Voice Assistant
+      const voiceBtn = document.getElementById('voiceBtn');
+      voiceBtn.addEventListener('click', async () => {
+        try {
+          const response = await fetch('/listen', { method: 'POST' });
+          const data = await response.json();
+          document.getElementById('voiceAnswer').innerText = data.answer || 'No voice response.';
+        } catch (err) {
+          document.getElementById('voiceAnswer').innerText = `Voice error: ${err.message}`;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

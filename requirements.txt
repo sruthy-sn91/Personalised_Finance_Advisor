@@ -1,0 +1,16 @@
+datasets==3.5.0
+faiss_cpu==1.10.0
+fastapi==0.115.12
+langchain_groq==0.3.1
+numpy
+peft==0.15.1
+PyPDF2==3.0.1
+python-dotenv==1.1.0
+pyttsx3==2.98
+Requests==2.32.3
+sentence_transformers==4.0.1
+speechrecognition==3.14.2
+torch==2.6.0
+transformers==4.50.3
+uvicorn==0.34.0
+yfinance==0.2.55
