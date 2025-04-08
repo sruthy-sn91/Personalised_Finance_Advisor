@@ -1,16 +1,26 @@
-datasets==3.5.0
-faiss_cpu==1.10.0
 fastapi==0.115.12
-langchain_groq==0.3.1
-numpy
-peft==0.15.1
+uvicorn[standard]==0.34.0
+jinja2==3.1.6
+pydantic==2.11.1
+torch==2.0.1
+transformers==4.46.0  # Compatible with trl==0.16.0 and torch==2.0.1
+peft==0.6.0
+datasets==3.5.0
+trl==0.16.0
 PyPDF2==3.0.1
-python-dotenv==1.1.0
-pyttsx3==2.98
-Requests==2.32.3
-sentence_transformers==4.0.1
-speechrecognition==3.14.2
-torch==2.6.0
-transformers==4.50.3
-uvicorn==0.34.0
+faiss-cpu==1.10.0
+sentence-transformers==2.2.2  # Compatible with numpy<2 and torch==2.0.1
 yfinance==0.2.55
+beautifulsoup4==4.13.3
+requests==2.32.3
+speechrecognition==3.14.2
+pyttsx3==2.98
+python-dotenv==1.1.0
+lxml_html_clean==0.4.1
+nest_asyncio==1.6.0
+requests-html==0.10.0
+langchain_groq==0.3.1
+numpy<2  # Ensure compatibility with modules compiled against NumPy 1.x
+pyaudio>=0.2.11  # Explicitly added for speechrecognition
+huggingface_hub
+nltk
